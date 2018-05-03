@@ -7,9 +7,11 @@
 
 O funcionamento de uma rede neural de um neurônio só serve para classificar problemas lineares. Por exemplo, caso seja um problema de duas dimensões, deve ser possivel separar as amostrar por uma reta.
 Digamos que estamos tentando treinar a rede neural para funcionar como a porta lógica AND, as amostras serão distribuídas como o gráfico a seguir:
+
 ![Gráfico da porta lógica AND](img/AND.png "Gráfico da porta lógica AND")
 
 A rede neural então precisa aprender a traçar uma reta que definirá a classificação, uma das possíveis soluções seria a seguinte:
+
 ![Gráfico da reta traçada pela perceptron trinada pela porta lógica AND](img/AND-AFTER.png "Gráfico da reta traçada pela perceptron trinada pela porta lógica AND")
 
 #### Como funcionar?
