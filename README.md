@@ -21,5 +21,26 @@ const saida_das_amostras=[1,0,0,0]
 ```
 ou seja, para a entrada [1,1] a rede neural deve resultar em 1, para [1,0], [0,1] ou [0,0] a rede neural deve resultar em 0.
 
+A rede neural vai funcionar baseada em pesos (inicializados aleatoriamente na criação da rede) associados para cada entrada, esses pesos são atualizados no processo de treinamento. Para que a reta traçada pela rede neural não fique localizada na origem [0,0] é usado um bias(análogo ao threshold) com valor -1, e um pesso associado a ele que também será atualizado.
+
+#### Vou citar as funções necessárias para o funcionamento da rede:
+* vamos chamar de activation a: Função degrau que retorna 0 para qualquer valor abaixo de 0, e 1 caso o contrário.
+* vamos chamar de multiply a: Função que somará a multiplicação entre as entradas e seus pesos também somado com a multiplicação entre o bias e seu peso
+* vamos chamar de prediction a: Função que passa o resultado da multiply() pela função activation()
+* vamos chamar de fit a: Função de treinamento que será explicada a seguir
+
+#### Treinamento:
+para cara época e cada peso é feita uma previsão(prediction) em seguida é comparada a saída esperada já dada. Em seguida existem alguns casos:
+1. Caso a entrada que está sendo analizada no momento seja 0, não se altera o peso.
+1. Caso a previsão tenha dada menor que a saída esperada é necessário decrementar o peso da entrada na qual está sendo comparada.
+1. Caso a previsão seja maior que a saída esperada é necessário incremenar o peso da entrada na qual está sendo comparada.
+1. Caso a previsão tenha dado igual a saída esperada, não se mexe no peso.
+
+**O peso do bias será atualizado da mesma forma, porem a entrada é o bias**
+
+**O peso será incrementado ou decrementado exatamento o LearningRate**(passo do aprendizado, quanto menor esse valor a rede neural será mais precisa mas também mais custosa computacionalmente)
+
+Após treinar a single layer perceptron, é só usar a função prediction com a entrada à sua escolha
+
 
 ## Multi Layer Perceptron, como funciona:
