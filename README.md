@@ -53,5 +53,3 @@ para cara época e cada peso é feita uma previsão(prediction) em seguida é co
 **O peso será incrementado ou decrementado exatamento o LearningRate**(passo do aprendizado, quanto menor esse valor a rede neural será mais precisa mas também mais custosa computacionalmente)
 
 Após treinar a single layer perceptron, é só usar a função prediction com a entrada à sua escolha
-
-## Multi Layer Perceptron, como funciona:
