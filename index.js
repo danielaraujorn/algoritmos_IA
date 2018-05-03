@@ -1,7 +1,11 @@
+const activationTypeObj={
+	tanh:(n)=>Math.tanh(n),
+}
 class Perceptron{
-	constructor (x, y, epochs=1000, learn_rate= 0.1, error=0) {
+	constructor (x, y, epochs=1000, learn_rate= 0.1, error=0,activation='tanh') {
 
 	// used to generate percent accuracy
+	this.activationType=activation
 	this.error=error
 	this.acc = 0
 	this.samples = 0
@@ -23,15 +27,19 @@ class Perceptron{
 	activation (n) {
 		return n < 0 ? 0 : 1
 	}
-	multiply(input){
-		let sum = -this.biasWeight
+	multiply(input,weights,bias){
+		let sum = -bias
 		for (var i = input.length - 1; i >= 0; i--) {
-			sum+=(input[i]*this.weights[i])
+			sum+=(input[i]*weights[i])
 		}
 		return sum
 	}
 	predict (input) {
-		return this.activation(this.multiply(input))
+		return this.activation(this.multiply(input,this.weights,this.biasWeight))
+	}
+
+	fowardPass(input,weight,bias){
+		return activationTypeObj[this.activationType](this.multiply(input,weights,bias))
 	}
 
 	fit () {
