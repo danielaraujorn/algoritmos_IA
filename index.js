@@ -1,7 +1,10 @@
 const activationTypeObj = {
   tanh: n => Math.tanh(n),
-  sigmoid: value => 1 / (1 + exp(-value)),
-  sigmoid_derivative: value => value * (1 - value)
+  sigmoid: value => 1 / (1 + Math.exp(-value)),
+  sigmoidDerivative: value => {
+    let sig = 1 / (1 + Math.exp(-value));
+    return sig * (1 - sig);
+  }
 };
 class Perceptron {
   constructor(
@@ -42,25 +45,23 @@ class Perceptron {
         new Array(hiddenLayersCount).fill(0).map(i => Math.random() * 2 - 1)
       );
   }
-
-  accuracy() {
-    return this.acc / this.samples;
-  }
-
   activation(n) {
-    return n < 0 ? 0 : 1;
+    return activationTypeObj[this.activationType](n);
+  }
+  activationDerivative(n) {
+    return activationTypeObj[this.activationType + "Derivative"](n);
   }
   multiply(input, weights) {
-    let sum = -weights[input.length - 1];
-    for (var i = input.length - 2; i >= 0; i--) {
+    console.log("multiply", input, weights);
+    let sum = -weights[weights.length - 1];
+    for (var i = 0; i < input.length; i++) {
       sum += input[i] * weights[i];
     }
     return sum;
   }
   predict(input, weights) {
-    return activationTypeObj[this.activationType](
-      this.multiply(input, weights)
-    );
+    // console.log("predict", input, weights);
+    return this.activation(this.multiply(input, weights));
   }
 
   feedFoward(input, layerIndex) {
@@ -70,9 +71,7 @@ class Perceptron {
       for (let j = 0; j < this.layers[i].length; j++) {
         tempInput = [
           ...tempInput,
-          activationTypeObj[this.activationType](
-            this.multiply(newInput, this.layers[i][j])
-          )
+          this.activation(this.multiply(validInput, this.layers[i][j]))
         ];
       }
       validInput = tempInput;
@@ -80,14 +79,7 @@ class Perceptron {
     }
     return validInput;
   }
-  totalError() {
-    let sum = 0;
-    for (let inputIndex = 0; inputIndex < this.x.length; inputIndex++) {
-      sum += this.error(this.x[inputIndex], this.y[inputIndex]);
-    }
-    return sum / this.x.length;
-  }
-  error(input, output) {
+  oneError(input, output) {
     let sum = 0;
     for (let outputIndex = 0; outputIndex < output.length; outputIndex++) {
       sum += Math.pow(
@@ -99,18 +91,29 @@ class Perceptron {
         2
       );
     }
+    // console.log("oneError", sum / 2);
     return sum / 2;
+  }
+  totalError() {
+    let sum = 0;
+    for (let inputIndex = 0; inputIndex < this.x.length; inputIndex++) {
+      sum += this.oneError(this.x[inputIndex], this.y[inputIndex]);
+    }
+    // console.log("total error", sum, this.x.length);
+    return sum / this.x.length;
   }
   fit() {
     return new Promise(resolve => {
       for (let e = 0; e < this.epochs; e++) {
+        // this.oWeights[neuronio][peso]+=this.learn_rate*this.oneError(this.x[],this.y[])*this.activationDerivative(this.x[],camada)
+        // this.layers[camada][neuronio][peso]+=this.learn_rate*this.oneError(this.x[],this.y[])*this.activationDerivative(this.x[],camada)
         // for (let inputIndex = 0; inputIndex < this.x.length; inputIndex++) {
         //   for (let a = 0; a < this.y[0].length; a++) {
         //     let erro = this.error(this.x[inputIndex], this.y[inputIndex]);
         //   }
         // }
         // this.x.forEach((input, i) => {
-        //   let prediction = this.predict(input);
+        //   let predic tion = this.predict(input);
         //   this.y[i] === prediction ? (this.acc += 1) : (this.acc -= 1);
         //   let loss = this.y[i] - prediction;
         //   for (var p = this.weights.length - 1; p >= 0; p--) {
@@ -122,7 +125,7 @@ class Perceptron {
         // console.log(this.accuracy(), e);
         // if (1 - this.accuracy() < this.error) break;
       }
-      console.log(this.weights, this.biasWeight);
+      console.log(this.layers, this.oWeights);
       resolve();
     });
   }
@@ -131,10 +134,11 @@ let x = [[1, 1], [0, 1], [1, 0], [0, 0]];
 let y = [[1], [1], [1], [0]];
 let myPerceptron = new Perceptron(x, 2, 3, y, 50000, 0.01, 0.05);
 
-myPerceptron.fit().then(() => {
-  console.log(
-    "vai",
-    myPerceptron.predict([1, 1]),
-    myPerceptron.predict([0, 0])
-  );
-});
+// console.log("totalError", myPerceptron.totalError());
+// myPerceptron.fit().then(() => {
+//   console.log(
+//     "vai"
+//     // myPerceptron.predict([1, 1]),
+//     // myPerceptron.predict([0, 0])
+//   );
+// });
