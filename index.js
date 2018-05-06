@@ -52,7 +52,7 @@ class Perceptron {
     return activationTypeObj[this.activationType + "Derivative"](n);
   }
   multiply(input, weights) {
-    console.log("multiply", input, weights);
+    // console.log("multiply", input, weights);
     let sum = -weights[weights.length - 1];
     for (var i = 0; i < input.length; i++) {
       sum += input[i] * weights[i];
@@ -65,6 +65,7 @@ class Perceptron {
   }
 
   feedFoward(input, layerIndex) {
+    // mostra as entradad da camada que vc deseja
     let validInput = [...input];
     let tempInput = [];
     for (let i = 0; i < layerIndex + 1; i++) {
@@ -80,24 +81,35 @@ class Perceptron {
     return validInput;
   }
   oneError(input, output) {
+    // acha o erro relativo a camada
+    let feedFoward = this.feedFoward(input, this.layers.length - 1);
+
     let sum = 0;
     for (let outputIndex = 0; outputIndex < output.length; outputIndex++) {
       sum += Math.pow(
         output[outputIndex] -
-          this.predict(
-            this.feedFoward(input, this.layers[this.layers.length - 1]),
-            this.oWeights[outputIndex]
-          ),
+          this.predict(feedFoward, this.oWeights[outputIndex]),
         2
       );
     }
     // console.log("oneError", sum / 2);
     return sum / 2;
   }
+  errorOutput(input, output, pesos) {
+    return (
+      output -
+      this.predict(this.feedFoward(input, this.layers.length - 1), pesos)
+    );
+  }
   totalError() {
+    // acha o erro na ultima camada
     let sum = 0;
     for (let inputIndex = 0; inputIndex < this.x.length; inputIndex++) {
-      sum += this.oneError(this.x[inputIndex], this.y[inputIndex]);
+      sum += this.oneError(
+        this.x[inputIndex],
+        this.y[inputIndex],
+        this.layers.length - 1
+      );
     }
     // console.log("total error", sum, this.x.length);
     return sum / this.x.length;
@@ -105,7 +117,33 @@ class Perceptron {
   fit() {
     return new Promise(resolve => {
       for (let e = 0; e < this.epochs; e++) {
-        // this.oWeights[neuronio][peso]+=this.learn_rate*this.oneError(this.x[],this.y[])*this.activationDerivative(this.x[],camada)
+        for (
+          let datasetIndex = 0;
+          datasetIndex < this.x.length;
+          datasetIndex++
+        ) {
+          for (let neuronio = 0; neuronio < this.oWeights.length; neuronio++) {
+            for (let peso = 0; peso < this.oWeights[neuronio].length; peso++) {
+              let entradaCamada = this.feedFoward(
+                this.x[datasetIndex],
+                this.layers.length - 1
+              );
+              this.oWeights[neuronio][peso] +=
+                this.errorOutput(
+                  entradaCamada,
+                  this.y[datasetIndex],
+                  this.oWeights[neuronio]
+                ) *
+                this.activationDerivative(
+                  this.multiply(entradaCamada, this.oWeights[neuronio])
+                ) *
+                entradaCamada[peso];
+            }
+          }
+          //para cada camada oculta backwards
+          // para cada neuronio da camada
+          // para cada peso do neuronio
+        }
         // this.layers[camada][neuronio][peso]+=this.learn_rate*this.oneError(this.x[],this.y[])*this.activationDerivative(this.x[],camada)
         // for (let inputIndex = 0; inputIndex < this.x.length; inputIndex++) {
         //   for (let a = 0; a < this.y[0].length; a++) {
@@ -124,15 +162,18 @@ class Perceptron {
         // });
         // console.log(this.accuracy(), e);
         // if (1 - this.accuracy() < this.error) break;
+        // console.log(this.oWeights);
       }
-      console.log(this.layers, this.oWeights);
+      // console.log(this.layers, this.oWeights);
       resolve();
     });
   }
 }
 let x = [[1, 1], [0, 1], [1, 0], [0, 0]];
 let y = [[1], [1], [1], [0]];
-let myPerceptron = new Perceptron(x, 2, 3, y, 50000, 0.01, 0.05);
+let myPerceptron = new Perceptron(x, 2, 3, y, 1000, 0.01, 0.05);
+
+myPerceptron.fit().then(() => console.log(myPerceptron.totalError()));
 
 // console.log("totalError", myPerceptron.totalError());
 // myPerceptron.fit().then(() => {
