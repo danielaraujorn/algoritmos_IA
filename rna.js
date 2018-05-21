@@ -85,54 +85,82 @@ class NeuralNetwork {
   trainStep(input_array, target_array) {
     // Generating the Hidden Outputs
     let inputs = Matrix.fromArray(input_array);
+    // console.log("inputs", inputs);
+    // console.log("pesos", this.weights_ih);
     let hidden = Matrix.multiply(this.weights_ih, inputs);
+    // console.log("hidden", hidden);
+    // console.log("bias", this.bias_h);
     hidden.add(this.bias_h);
+    // console.log("hiddenb", hidden);
     // activation function!
     hidden.map(this.activation_function.func);
+    // console.log("hiddensigmoid", hidden);
 
     // Generating the output's output!
     let outputs = Matrix.multiply(this.weights_ho, hidden);
+    // console.log("outputs", outputs);
+    // console.log("bias out", this.bias_o);
     outputs.add(this.bias_o);
+    // console.log("outb", outputs);
     outputs.map(this.activation_function.func);
+    // console.log("outsigmoid", outputs);
 
     // Convert array to matrix object
     let targets = Matrix.fromArray(target_array);
+    // console.log("targets", targets);
 
     // Calculate the error
     // ERROR = TARGETS - OUTPUTS
     let output_errors = Matrix.subtract(targets, outputs);
+    // console.log("output error", output_errors);
 
     // let gradient = outputs * (1 - outputs);
     // Calculate gradient
     let gradients = Matrix.map(outputs, this.activation_function.dfunc);
+    // console.log("gradient", gradients);
     gradients.multiply(output_errors);
+    // console.log("gradient*errors", gradients);
     gradients.multiply(this.learning_rate);
+    // console.log("gradient*learning", gradients);
 
     // Calculate deltas
     let hidden_T = Matrix.transpose(hidden);
+    // console.log("hidden_T", hidden_T);
     let weight_ho_deltas = Matrix.multiply(gradients, hidden_T);
+    // console.log("weight_ho_deltas", weight_ho_deltas);
 
     // Adjust the weights by deltas
     this.weights_ho.add(weight_ho_deltas);
+    // console.log("this.weights_ho", this.weights_ho);
     // Adjust the bias by its deltas (which is just the gradients)
     this.bias_o.add(gradients);
+    // console.log("bias_o", this.bias_o);
 
     // Calculate the hidden layer errors
     let who_t = Matrix.transpose(this.weights_ho);
+    // console.log("who_t", who_t);
     let hidden_errors = Matrix.multiply(who_t, output_errors);
+    // console.log("hidden_errors", hidden_errors);
 
     // Calculate hidden gradient
     let hidden_gradient = Matrix.map(hidden, this.activation_function.dfunc);
+    // console.log("hidden_errors", hidden_gradient);
     hidden_gradient.multiply(hidden_errors);
+    // console.log("hidden_gradient*hidden_errors", hidden_gradient);
     hidden_gradient.multiply(this.learning_rate);
+    // console.log("hidden_gradient*learning_rate", hidden_gradient);
 
     // Calcuate input->hidden deltas
     let inputs_T = Matrix.transpose(inputs);
+    // console.log("inputs_T", inputs_T);
     let weight_ih_deltas = Matrix.multiply(hidden_gradient, inputs_T);
+    // console.log("weight_ih_deltas", weight_ih_deltas);
 
     this.weights_ih.add(weight_ih_deltas);
+    // console.log("weights_ih", this.weights_ih);
     // Adjust the bias by its deltas (which is just the gradients)
     this.bias_h.add(hidden_gradient);
+    // console.log("bias_h", this.bias_h);
 
     // outputs.print();
     // targets.print();
